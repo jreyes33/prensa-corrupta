@@ -17,8 +17,11 @@ pub struct Credentials {
     pub access_token_secret: String,
 }
 
-pub fn auth(credentials: &Credentials, method: &Method, base_url: &str,
-            params: &HashMap<&str, &str>) -> Authorization<String> {
+pub fn auth(credentials: &Credentials,
+            method: &Method,
+            base_url: &str,
+            params: &HashMap<&str, &str>)
+            -> Authorization<String> {
     let nonce_string = thread_rng().gen_ascii_chars().take(32).collect::<String>();
     let oauth_header = OAuthHeader {
         credentials: credentials,
@@ -28,7 +31,7 @@ pub fn auth(credentials: &Credentials, method: &Method, base_url: &str,
         version: "1.0",
         method: method,
         base_url: base_url,
-        params: params
+        params: params,
     };
     Authorization(oauth_header.to_string())
 }
@@ -46,9 +49,12 @@ struct OAuthHeader<'a> {
 
 impl<'a> OAuthHeader<'a> {
     fn sign(&self) -> String {
-        let signature_base = format!("{}&{}&{}", self.method, url_encode(self.base_url),
+        let signature_base = format!("{}&{}&{}",
+                                     self.method,
+                                     url_encode(self.base_url),
                                      url_encode(self.params_string()));
-        let key = format!("{}&{}", self.credentials.consumer_secret,
+        let key = format!("{}&{}",
+                          self.credentials.consumer_secret,
                           self.credentials.access_token_secret);
         let mut hmac = Hmac::new(Sha1::new(), key.as_bytes());
         hmac.input(signature_base.as_bytes());
@@ -65,9 +71,12 @@ impl<'a> OAuthHeader<'a> {
         oauth_params.insert("oauth_timestamp", timestamp_string.as_str());
         oauth_params.insert("oauth_token", self.credentials.access_token.as_str());
         oauth_params.insert("oauth_version", "1.0");
-        let mut params: Vec<String> = oauth_params.iter().chain(self.params.iter()).map({ |(&k, &v)|
-            format!("{}={}", percent_encode(k), percent_encode(v))
-        }).collect();
+        let mut params: Vec<String> = oauth_params.iter()
+            .chain(self.params.iter())
+            .map({
+                |(&k, &v)| format!("{}={}", percent_encode(k), percent_encode(v))
+            })
+            .collect();
         params.sort();
         params.join("&")
     }
@@ -78,16 +87,27 @@ impl<'a> fmt::Display for OAuthHeader<'a> {
         write!(formatter,
                "OAuth oauth_consumer_key=\"{}\", oauth_nonce=\"{}\", oauth_signature=\"{}\", \
                 oauth_signature_method=\"{}\", oauth_timestamp=\"{}\", oauth_token=\"{}\", \
-                oauth_version=\"{}\"", self.credentials.consumer_key, self.nonce, self.sign(),
-                self.signature_method, self.timestamp, self.credentials.access_token, self.version)
+                oauth_version=\"{}\"",
+               self.credentials.consumer_key,
+               self.nonce,
+               self.sign(),
+               self.signature_method,
+               self.timestamp,
+               self.credentials.access_token,
+               self.version)
     }
 }
 
-fn url_encode<S>(string: S) -> String where S: Into<String> {
+fn url_encode<S>(string: S) -> String
+    where S: Into<String>
+{
     url::form_urlencoded::byte_serialize(string.into().as_bytes()).collect::<String>()
 }
 
-fn percent_encode<S>(string: S) -> String where S: Into<String> {
-    url::percent_encoding::percent_encode(string.into().as_bytes(), url::percent_encoding::QUERY_ENCODE_SET)
+fn percent_encode<S>(string: S) -> String
+    where S: Into<String>
+{
+    url::percent_encoding::percent_encode(string.into().as_bytes(),
+                                          url::percent_encoding::QUERY_ENCODE_SET)
         .collect::<String>()
 }

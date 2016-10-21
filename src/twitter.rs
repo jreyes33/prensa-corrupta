@@ -10,7 +10,7 @@ use oauth::{auth, Credentials};
 
 #[derive(Deserialize, Debug)]
 struct Tweet {
-    text: String
+    text: String,
 }
 
 pub fn last_tweet(credentials: &Credentials, screen_name: &str) -> String {
@@ -23,8 +23,10 @@ pub fn last_tweet(credentials: &Credentials, screen_name: &str) -> String {
     params.insert("include_rts", "false");
     params.insert("count", "5");
     let url = format!("{}?{}", base_url, query_string(&params));
-    let mut response = client.get(&url).header(auth(credentials, &method, base_url, &params))
-        .send().unwrap();
+    let mut response = client.get(&url)
+        .header(auth(credentials, &method, base_url, &params))
+        .send()
+        .unwrap();
     let mut body = String::new();
     response.read_to_string(&mut body).expect("Should not fail");
     let value: serde_json::value::Value = serde_json::from_str(&body).unwrap();
@@ -44,16 +46,22 @@ pub fn send_tweet(credentials: &Credentials, text: &str) -> Result<&'static str,
         .header(auth(credentials, &method, base_url, &params))
         .header(ContentType::form_url_encoded())
         .body(&payload)
-        .send().unwrap();
+        .send()
+        .unwrap();
     let mut body = String::new();
     response.read_to_string(&mut body).expect("Should not fail");
     Ok("Success")
 }
 
 fn query_string(params: &HashMap<&str, &str>) -> String {
-    params.iter().map({ |(&k, &v)|
-        format!("{}={}",
-                percent_encode(k.as_bytes(), QUERY_ENCODE_SET).collect::<String>(),
-                percent_encode(v.as_bytes(), QUERY_ENCODE_SET).collect::<String>())
-    }).collect::<Vec<String>>().join("&")
+    params.iter()
+        .map({
+            |(&k, &v)| {
+                format!("{}={}",
+                        percent_encode(k.as_bytes(), QUERY_ENCODE_SET).collect::<String>(),
+                        percent_encode(v.as_bytes(), QUERY_ENCODE_SET).collect::<String>())
+            }
+        })
+        .collect::<Vec<String>>()
+        .join("&")
 }

@@ -4,8 +4,16 @@ use twitter::last_tweet;
 use oauth::Credentials;
 
 pub fn new_tweet(credentials: &Credentials) -> String {
-    let media_outlets = ["el_telegrafo", "eluniversocom", "elcomerciocom", "andesecuador",
-    "ecuavisa", "ecuadortv", "ElCiudadano_ec", "mercurioec", "lahoraecuador", "eldiarioec"];
+    let media_outlets = ["el_telegrafo",
+                         "eluniversocom",
+                         "elcomerciocom",
+                         "andesecuador",
+                         "ecuavisa",
+                         "ecuadortv",
+                         "ElCiudadano_ec",
+                         "mercurioec",
+                         "lahoraecuador",
+                         "eldiarioec"];
     let mut rng = thread_rng();
     let chosen_outlets = sample(&mut rng, media_outlets.iter(), 2);
     println!("chosen_outlets: {:?}", chosen_outlets);
