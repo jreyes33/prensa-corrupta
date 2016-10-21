@@ -30,7 +30,6 @@ pub fn auth(credentials: &Credentials, method: &Method, base_url: &str,
         base_url: base_url,
         params: params
     };
-    println!("{}", oauth_header);
     Authorization(oauth_header.to_string())
 }
 
@@ -49,7 +48,6 @@ impl<'a> OAuthHeader<'a> {
     fn sign(&self) -> String {
         let signature_base = format!("{}&{}&{}", self.method, url_encode(self.base_url),
                                      url_encode(self.params_string()));
-        println!("{}", signature_base);
         let key = format!("{}&{}", self.credentials.consumer_secret,
                           self.credentials.access_token_secret);
         let mut hmac = Hmac::new(Sha1::new(), key.as_bytes());

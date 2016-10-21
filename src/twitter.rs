@@ -40,7 +40,6 @@ pub fn send_tweet(credentials: &Credentials, text: &str) -> Result<&'static str,
     let mut params = HashMap::new();
     params.insert("status", text);
     let payload = query_string(&params);
-    println!("payload: {}", payload);
     let mut response = client.post(base_url)
         .header(auth(credentials, &method, base_url, &params))
         .header(ContentType::form_url_encoded())
@@ -48,7 +47,6 @@ pub fn send_tweet(credentials: &Credentials, text: &str) -> Result<&'static str,
         .send().unwrap();
     let mut body = String::new();
     response.read_to_string(&mut body).expect("Should not fail");
-    println!("send_tweet response: {}", body);
     Ok("Success")
 }
 
