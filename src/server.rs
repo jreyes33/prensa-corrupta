@@ -9,12 +9,13 @@ use oauth::Credentials;
 
 pub fn listen(port: u16, authorized_path: String, credentials: Credentials) {
     let bind_address = ("0.0.0.0", port);
+    let valid_path = format!("/{}", authorized_path);
     println!("Server listening on: {:?}", bind_address);
     Server::http(bind_address)
         .unwrap()
         .handle(move |req: Request, mut res: Response| {
             match (req.uri, req.method) {
-                (AbsolutePath(ref path), hyper::Post) if path == authorized_path.as_str() => {
+                (AbsolutePath(ref path), hyper::Post) if path == valid_path.as_str() => {
                     match send_tweet(&credentials, &new_tweet(&credentials)) {
                         Ok(_) => *res.status_mut() = StatusCode::Created,
                         Err(_) => *res.status_mut() = StatusCode::InternalServerError,

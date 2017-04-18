@@ -1,6 +1,8 @@
 use hyper::client::Client;
 use hyper::header::ContentType;
 use hyper::method::Method;
+use hyper::net::HttpsConnector;
+use hyper_native_tls::NativeTlsClient;
 use serde_json;
 use std::collections::HashMap;
 use std::io::Read;
@@ -14,7 +16,7 @@ struct Tweet {
 }
 
 pub fn last_tweet(credentials: &Credentials, screen_name: &str) -> String {
-    let client = Client::new();
+    let client = build_client();
     let method = Method::Get;
     let base_url = "https://api.twitter.com/1.1/statuses/user_timeline.json";
     let mut params = HashMap::new();
@@ -36,7 +38,7 @@ pub fn last_tweet(credentials: &Credentials, screen_name: &str) -> String {
 }
 
 pub fn send_tweet(credentials: &Credentials, text: &str) -> Result<&'static str, &'static str> {
-    let client = Client::new();
+    let client = build_client();
     let method = Method::Post;
     let base_url = "https://api.twitter.com/1.1/statuses/update.json";
     let mut params = HashMap::new();
@@ -51,6 +53,12 @@ pub fn send_tweet(credentials: &Credentials, text: &str) -> Result<&'static str,
     let mut body = String::new();
     response.read_to_string(&mut body).expect("Should not fail");
     Ok("Success")
+}
+
+fn build_client() -> Client {
+    let ssl = NativeTlsClient::new().unwrap();
+    let connector = HttpsConnector::new(ssl);
+    Client::with_connector(connector)
 }
 
 fn query_string(params: &HashMap<&str, &str>) -> String {

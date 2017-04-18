@@ -8,12 +8,13 @@ publish = false
 name = "prensa-corrupta"
 
 [dependencies]
-hyper = "0.9"
+hyper = "0.10"
+hyper-native-tls = "0.2"
 rust-crypto = "0.2"
 rand = "0.3"
 chrono = "0.2"
 url = "1.1"
 base64 = "0.2"
-serde_json = "0.8"
-serde = "0.8"
-serde_derive = "0.8"
+serde = "0.9"
+serde_json = "0.9"
+serde_derive = "0.9"

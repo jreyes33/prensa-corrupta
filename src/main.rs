@@ -1,8 +1,8 @@
-#![feature(proc_macro)]
 extern crate base64;
 extern crate chrono;
 extern crate crypto;
 extern crate hyper;
+extern crate hyper_native_tls;
 extern crate rand;
 #[macro_use]
 extern crate serde_derive;
